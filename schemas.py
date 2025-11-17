@@ -11,8 +11,9 @@ Model name is converted to lowercase for the collection name:
 - BlogPost -> "blogs" collection
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from typing import Optional
+from datetime import datetime
 
 # Example schemas (replace with your own):
 
@@ -38,11 +39,26 @@ class Product(BaseModel):
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
-# --------------------------------------------------
+# Crowdfunding schemas
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class Campaign(BaseModel):
+    """
+    Campaign collection schema
+    Collection name: "campaign"
+    """
+    title: str = Field(..., description="Campaign title")
+    description: str = Field(..., description="Why you're raising funds")
+    goal_amount: float = Field(..., gt=0, description="Total amount to raise")
+    max_supporters: Optional[int] = Field(100, gt=0, description="Maximum number of supporters")
+    deadline: Optional[datetime] = Field(None, description="Optional deadline for the campaign")
+
+class Contribution(BaseModel):
+    """
+    Contribution collection schema
+    Collection name: "contribution"
+    """
+    name: str = Field(..., description="Supporter's name")
+    email: EmailStr = Field(..., description="Supporter's email")
+    amount: float = Field(..., gt=0, description="Contribution amount in dollars")
+    message: Optional[str] = Field(None, description="A short note from the supporter")
+    is_public: bool = Field(True, description="Whether to show their name/messages publicly")
